@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from texttosign.text_recognition import TextToSign
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT
+from camera.camera import camera_stream
 from keras.models import load_model
 
 app = Flask(__name__)
@@ -40,6 +41,20 @@ def text_recognition():
     # Return the processed text
     return jsonify({'frames_path': frames_path})
     
+
+def gen_frame():
+    """Video streaming generator function."""
+    while True:
+        frame = camera_stream()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') # concate frame one by one and show result
+
+
+@app.route('/api/video_feed')
+def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(gen_frame(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
     app.run(debug=True)
