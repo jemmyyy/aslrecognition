@@ -8,7 +8,7 @@ video_capture = cv2.VideoCapture(0)  # 0 for web camera live stream
 def camera_stream():
      # Capture frame-by-frame
     ret, frame = video_capture.read()
-
+    frame_array = cv2.resize(frame, (224, 224), interpolation = cv2.INTER_LINEAR)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # # Display the resulting frame in browser
-    return frame, cv2.imencode('.jpg', frame)[1].tobytes()
+    return frame_array, cv2.imencode('.jpg', frame)[1].tobytes()
