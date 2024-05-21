@@ -28,11 +28,11 @@ def text_recognition():
     return jsonify({'frames_path': frames_path})
     
 
-def gen_frame():
+def gen_frame(request):
     """Video streaming generator function."""
     while True:
         frame_array, frame = camera_stream()
-        sign_detection.add_frame_to_vid(frame = frame_array)
+        sign_detection.add_frame_to_vid(frame = frame_array, request=request)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') # concate frame one by one and show result
 
@@ -40,7 +40,7 @@ def gen_frame():
 @app.route('/api/video_feed')
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen_frame(),
+    return Response(gen_frame(request),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":

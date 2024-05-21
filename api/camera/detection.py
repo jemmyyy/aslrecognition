@@ -22,7 +22,7 @@ class SignDetection:
         rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
         return np.concatenate([lh, rh])
 
-    def add_frame_to_vid(self, frame):
+    def add_frame_to_vid(self, frame, request):
         self.current_vid.append(frame)
         if len(self.current_vid) == 20:
             sign = self.detect_sign(self.current_vid)
@@ -31,7 +31,7 @@ class SignDetection:
                 if len(np.unique(self.signs_detected)) == 1:
                     self.final_sign = self.signs_detected[0]
                     self.signs_detected = []
-                    emit("data",{'data':self.final_sign},broadcast=True)
+                    emit("data",{'data':self.final_sign, 'id': request.sid},broadcast=True)
 
     def detect_sign(self, vid):
         frames_queue = []
