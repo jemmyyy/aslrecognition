@@ -3,6 +3,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 from utils import SEQUENCE_LENGTH, CLASSES_LIST, CLASSES_NAMES
+from flask_socketio import emit
 
 class SignDetection:
     def __init__(self, model, no_frames = 20):
@@ -12,6 +13,7 @@ class SignDetection:
         self.model = model
         self.mp_holistic = mp.solutions.holistic
         self.holistic = self.mp_holistic.Holistic()
+        self.final_sign = ''
 
     def extract_keypoints(self, results):
         # pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
@@ -27,7 +29,9 @@ class SignDetection:
             self.signs_detected.append(sign)
             if len(self.signs_detected) == 5:
                 if len(np.unique(self.signs_detected)) == 1:
-                    return self.signs_detected[0]
+                    self.final_sign = self.signs_detected[0]
+                    self.signs_detected = []
+                    emit("data",{'data':self.final_sign},broadcast=True)
 
     def detect_sign(self, vid):
         frames_queue = []
