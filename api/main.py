@@ -3,24 +3,10 @@ from texttosign.text_recognition import TextToSign
 from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT
 from camera.camera import camera_stream
 from keras.models import load_model
+from camera.detection import SignDetection
 
 app = Flask(__name__)
 
-
-@app.route('/api/signtotext/', methods = ['GET'])
-def signToText():
-    video = request.data
-    vidcap = VideoCapture(video)
-    total_frames = vidcap.get(CAP_PROP_FRAME_COUNT)
-    print(total_frames)
-    n = 10
-    frames_step = total_frames//n
-    frames = []
-    for i in range(n):
-        #here, we set the parameter 1 which is the frame number to the frame (i*frames_step)
-        vidcap.set(1,i*frames_step)
-        success,image = vidcap.read()  
-        frames.append(image)
 
 @app.route('/api/texttosign', methods=['GET'])
 def text_recognition():
@@ -45,7 +31,8 @@ def text_recognition():
 def gen_frame():
     """Video streaming generator function."""
     while True:
-        frame = camera_stream()
+        frame_array, frame = camera_stream()
+        sign_detection.add_frame_to_vid(frame = frame_array)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') # concate frame one by one and show result
 
@@ -58,4 +45,6 @@ def video_feed():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    model = load_model()
+    model_path = 'C:/Users/Jemmy/Desktop/aslrecognition/model/mplstm_model_4WORDS_Run1__Date_Time_2024_05_11_11_25_46'
+    model = load_model(model_path)
+    sign_detection = SignDetection(model, 20)
