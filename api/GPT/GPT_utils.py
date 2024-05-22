@@ -14,7 +14,7 @@ def get_chatgpt_response(prompt):
     return response['choices'][0]['text'].strip()
 
 
-def translate_sign_to_text(sign_language_input):
+def revise_translated_sentence(sign_language_input):
 
     # Create prompt for ChatGPT to refine
     prompt = f"You are an Arabic sign language assistant, that works after a sign language translation AI model which translates from video to text. Revise and refine (if needed in case of confusion in translation) the following sentence to be more natural and contextually appropriate: '{sign_language_input}'"
@@ -32,7 +32,7 @@ def handle_user_query(user_query):
 
 # Example usage of translation function
 sign_language_input = "input from sign language recognition model"
-refined_output = translate_sign_to_text(sign_language_input)
+refined_output = revise_translated_sentence(sign_language_input)
 print("Refined Translation:", refined_output)
 
 # Example usage of user query handling
