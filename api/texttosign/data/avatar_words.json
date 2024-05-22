@@ -1,6 +1,19 @@
 {
-    "كيف" : "AvatarWords/kayf", 
-    "اسمك" : "AvatarWords/ma_esmok",
-    "ما" : "AvatarWords/kayf", 
-    "ماذا" : "AvatarWords/kayf"
+    "الحمد لله": "AvatarWords/al7amdolellah",
+    "الحال": "AvatarWords/al7aal",
+    "انا": "AvatarWords/ana",
+    "انت": "AvatarWords/anta",
+    "السلام عليكم": "AvatarWords/assalam_alaikum",
+    "جيد": "AvatarWords/jayyed",
+    "اسمك": "AvatarWords/ma_esmok",
+    "مهندس": "AvatarWords/mohandis",
+    "ما": "AvatarWords/kayf",
+    "سنك": "AvatarWords/sennk",
+    "تعمل": "AvatarWords/ta3ml",
+    "طريق": "AvatarWords/tariq",
+    "طعام": "AvatarWords/tta3am",
+    "يرغب": "AvatarWords/yar8ab",
+    "يذهب": "AvatarWords/yazhb",
+    "لا": "AvatarWords/la",
+    "زيارة": "AvatarWords/zyaarh"
 }
