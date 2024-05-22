@@ -2,7 +2,7 @@ from collections import deque
 import cv2
 import mediapipe as mp
 import numpy as np
-from utils import SEQUENCE_LENGTH, CLASSES_LIST, CLASSES_NAMES
+import camera.utils
 from flask_socketio import emit
 
 class SignDetection:
@@ -14,6 +14,7 @@ class SignDetection:
         self.mp_holistic = mp.solutions.holistic
         self.holistic = self.mp_holistic.Holistic()
         self.final_sign = ''
+        self.text_interpreted = ""
 
     def extract_keypoints(self, results):
         # pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
@@ -31,7 +32,11 @@ class SignDetection:
                 if len(np.unique(self.signs_detected)) == 1:
                     self.final_sign = self.signs_detected[0]
                     self.signs_detected = []
-                    emit("data",{'data':self.final_sign, 'id': request.sid},broadcast=True)
+                    self.text_interpreted +=  " " + self.final_sign
+                    emit("data",{'data':self.final_sign},broadcast=True)
+                    # if len(self.text_interpreted.split(" "))>5:
+                    #     tuned_text = chatGPT.detect(self.text_interpreted)
+                    #     emit("data",{'data':tuned_text,"reset":"true"},broadcast=True)
 
     def detect_sign(self, vid):
         frames_queue = []
@@ -41,14 +46,14 @@ class SignDetection:
             keypoints = self.extract_keypoints(results)
             frames_queue.append(keypoints)
 
-        if len(frames_queue) == SEQUENCE_LENGTH:
+        if len(frames_queue) == utils.SEQUENCE_LENGTH:
                 frames_array = np.array(frames_queue)
                 frames_array = np.expand_dims(frames_array, axis=0)
                 predicted_labels_probabilities = self.model.predict(frames_array)[0]
                 predicted_label_indx = np.argmax(predicted_labels_probabilities)
 
-                if 0 <= predicted_label_indx < len(CLASSES_LIST):
-                    predicted_class_name = CLASSES_LIST[predicted_label_indx]
-                    word = f"{CLASSES_NAMES[predicted_label_indx]}"
+                if 0 <= predicted_label_indx < len(utils.CLASSES_LIST):
+                    predicted_class_name = utils.CLASSES_LIST[predicted_label_indx]
+                    word = f"{utils.CLASSES_NAMES[predicted_label_indx]}"
                     
         return word

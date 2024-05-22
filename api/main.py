@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, Response
 from texttosign.text_recognition import TextToSign
-from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT
+from cv2 import VideoCapture, CAP_PROP_FRAME_COUNT, VideoCapture
 from camera.camera import camera_stream
 from keras.models import load_model
 from camera.detection import SignDetection
@@ -34,25 +34,26 @@ def text_recognition():
     return jsonify({'frames_path': frames_path})
     
 
-def gen_frame(request):
+
+def gen_frame():
+    video_capture = VideoCapture(0)  # 0 for web camera live stream
+
     """Video streaming generator function."""
-    while True:
-        frame_array, frame = camera_stream()
-<<<<<<< HEAD
+    while True and video_capture:
+        frame_array, frame = camera_stream(video_capture)
         if (sign_detection is not None):
             sign_detection.add_frame_to_vid(frame = frame_array)
-=======
-        sign_detection.add_frame_to_vid(frame = frame_array, request=request)
->>>>>>> c3d4dd651848d23a10a78a3ffab735be1b647d21
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') # concate frame one by one and show result
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') # concate frame one by one and show result
 
 
 @app.route('/api/video_feed')
 def video_feed():
+    print("video feed")
     """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen_frame(request),
+    return Response(gen_frame(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 @socketio.on("connect")
 def connected():
