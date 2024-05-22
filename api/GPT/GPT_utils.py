@@ -20,7 +20,8 @@ def revise_translated_sentence(sign_language_input):
     prompt = f"You are an Arabic sign language assistant, that works after a sign language translation AI model which translates from video to text. Revise and refine (if needed in case of confusion in translation) the following sentence to be more natural and contextually appropriate: '{sign_language_input}'"
 
     # Get refined translation from ChatGPT
-    refined_translation = get_chatgpt_response(prompt)
+    # refined_translation = get_chatgpt_response(prompt)
+    refined_translation = 'test'
     return refined_translation
 
 
