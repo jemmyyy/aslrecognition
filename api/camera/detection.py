@@ -13,7 +13,6 @@ class SignDetection:
         self.model = model
         self.mp_holistic = mp.solutions.holistic
         self.holistic = self.mp_holistic.Holistic()
-        self.final_sign = ''
         self.text_interpreted = ""
 
     def extract_keypoints(self, results):
@@ -24,36 +23,33 @@ class SignDetection:
         return np.concatenate([lh, rh])
 
     def add_frame_to_vid(self, frame, request):
-        self.current_vid.append(frame)
-        if len(self.current_vid) == 20:
+        image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = self.holistic.process(image_rgb)
+        keypoints = self.extract_keypoints(results)
+        self.current_vid.append(keypoints)
+        if len(self.current_vid) == self.no_frames:
             sign = self.detect_sign(self.current_vid)
             self.signs_detected.append(sign)
             if len(self.signs_detected) == 5:
                 if len(np.unique(self.signs_detected)) == 1:
-                    self.final_sign = self.signs_detected[0]
+                    final_sign = self.signs_detected[0]
                     self.signs_detected = []
-                    self.text_interpreted +=  " " + self.final_sign
-                    emit("data",{'data':self.final_sign},broadcast=True)
+                    self.text_interpreted +=  " " + final_sign
+                    emit("data",{'data':final_sign},broadcast=True)
                     # if len(self.text_interpreted.split(" "))>5:
                     #     tuned_text = chatGPT.detect(self.text_interpreted)
                     #     emit("data",{'data':tuned_text,"reset":"true"},broadcast=True)
 
     def detect_sign(self, vid):
-        frames_queue = []
-        for frame in vid:
-            image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            results = self.holistic.process(image_rgb)
-            keypoints = self.extract_keypoints(results)
-            frames_queue.append(keypoints)
+        frames_to_get = [x for x in range(0, len(vid), len(vid)/10) ]
+        frames = vid[frames_to_get]
+        frames_array = np.array(frames)
+        frames_array = np.expand_dims(frames_array, axis=0)
+        predicted_labels_probabilities = self.model.predict(frames_array)[0]
+        predicted_label_indx = np.argmax(predicted_labels_probabilities)
 
-        if len(frames_queue) == utils.SEQUENCE_LENGTH:
-                frames_array = np.array(frames_queue)
-                frames_array = np.expand_dims(frames_array, axis=0)
-                predicted_labels_probabilities = self.model.predict(frames_array)[0]
-                predicted_label_indx = np.argmax(predicted_labels_probabilities)
-
-                if 0 <= predicted_label_indx < len(utils.CLASSES_LIST):
-                    predicted_class_name = utils.CLASSES_LIST[predicted_label_indx]
-                    word = f"{utils.CLASSES_NAMES[predicted_label_indx]}"
+        if 0 <= predicted_label_indx < len(utils.CLASSES_LIST):
+            predicted_class_name = utils.CLASSES_LIST[predicted_label_indx]
+            word = f"{utils.CLASSES_NAMES[predicted_label_indx]}"
                     
         return word
