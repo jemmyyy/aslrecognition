@@ -13,6 +13,13 @@ CORS(app,resources={r"/*":{"origins":"*"}})
 socketio = SocketIO(app,cors_allowed_origins="*")
 
 sign_detection = None
+video_capture = None
+
+def open_camera():
+    global video_capture
+    if video_capture is None:
+        video_capture = VideoCapture(0)
+    return video_capture
 
 @app.route('/api/texttosign', methods=['GET'])
 def text_recognition():
@@ -36,15 +43,25 @@ def text_recognition():
 
 
 def gen_frame():
-    video_capture = VideoCapture(0)  # 0 for web camera live stream
-
     """Video streaming generator function."""
-    while True and video_capture:
+    global video_capture
+    global sign_detection
+    video_capture = open_camera() # 0 for web camera live stream
+    print("gen_frame",video_capture.isOpened())
+
+    while video_capture.isOpened():
         frame_array, frame = camera_stream(video_capture)
+
+        if frame_array is None or frame is None:
+            print("camera broke")
+            break
+
         if (sign_detection is not None):
             sign_detection.add_frame_to_vid(frame = frame_array)
+
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') # concate frame one by one and show result
+
 
 
 @app.route('/api/video_feed')
@@ -55,10 +72,32 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-@socketio.on("connect")
-def connected():
+@app.route('/api/release_camera')
+def release_camera():
+    print("release camera")
+    global video_capture
+    response = {
+        "status": "error",
+        "message": "Camera not released, because it is not in use"
+    }
+    if video_capture is not None:
+        video_capture.release()
+        print("released camera", video_capture.isOpened())
+        video_capture = None
+        response = {
+        "status": "success",
+        "message": "Camera released"
+    }
+
+    return jsonify(response)
+
+
+
+@socketio.on("start_analyzing")
+def connected(data):
     """event listener when client connects to the server"""
-    print(request.sid)
+    global sign_detection
+    print(request.sid,data)
     print("client has connected")
     sign_detection = SignDetection(model, 20)
 

@@ -7,7 +7,10 @@ import cv2
 def camera_stream(video_capture):
      # Capture frame-by-frame
     ret, frame = video_capture.read()
-    frame_array = cv2.resize(frame, (224, 224), interpolation = cv2.INTER_LINEAR)
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # # Display the resulting frame in browser
+    if not ret or frame is None:
+        return None, None 
+    else:
+        frame_array = cv2.resize(frame, (224, 224), interpolation = cv2.INTER_LINEAR)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # # Display the resulting frame in browser
     return frame_array, cv2.imencode('.jpg', frame)[1].tobytes()
