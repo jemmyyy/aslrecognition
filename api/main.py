@@ -6,6 +6,7 @@ from keras.models import load_model
 from camera.detection import SignDetection
 from flask_socketio import SocketIO,emit
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -14,6 +15,7 @@ socketio = SocketIO(app,cors_allowed_origins="*")
 
 sign_detection = None
 video_capture = None
+model = None
 
 def open_camera():
     global video_capture
@@ -49,7 +51,7 @@ def gen_frame():
     video_capture = open_camera() # 0 for web camera live stream
     print("gen_frame",video_capture.isOpened())
 
-    while video_capture.isOpened():
+    while video_capture is not None and video_capture.isOpened():
         frame_array, frame = camera_stream(video_capture)
 
         if frame_array is None or frame is None:
@@ -97,13 +99,16 @@ def release_camera():
 def connected(data):
     """event listener when client connects to the server"""
     global sign_detection
+    global model
+
     print(request.sid,data)
     print("client has connected")
-    sign_detection = SignDetection(model, 20)
+    sign_detection = SignDetection(model, 10)
 
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True,port=5001)
-    model_path = 'C:/Users/Jemmy/Desktop/aslrecognition/model/mplstm_model_4WORDS_Run1__Date_Time_2024_05_11_11_25_46'
+    model_path = os.path.join(os.getcwd(), 'model/mplstm_model_4WORDS_Run1__Date_Time_2024_05_11_11_25_46')
+    print("model path: ",model_path)
     model = load_model(model_path)
+    socketio.run(app, debug=True,port=5001)
