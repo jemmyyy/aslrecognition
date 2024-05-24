@@ -103,7 +103,7 @@ def connected(data):
 
     print(request.sid,data)
     print("client has connected")
-    sign_detection = SignDetection(model, 10)
+    sign_detection = SignDetection(model, socketio,10)
 
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
