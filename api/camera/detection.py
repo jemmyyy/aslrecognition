@@ -6,7 +6,7 @@ import camera.utils as utils
 from flask_socketio import emit
 
 class SignDetection:
-    def __init__(self, model, app,no_frames = 10):
+    def __init__(self, model, app, no_frames = 20, confidence_level = 0.9, ds = 19):
         self.no_frames = no_frames
         self.signs_detected = []
         self.current_vid = deque(maxlen = self.no_frames)
@@ -14,8 +14,11 @@ class SignDetection:
         self.mp_holistic = mp.solutions.holistic
         self.holistic = self.mp_holistic.Holistic()
         self.text_interpreted = ""
+        self.confidence_level = confidence_level
         self.app = app
         self.app.emit("data", {'data': "shaghal"})
+        self.classes_list = utils.CLASSES_LIST_19 if ds == 19 else utils.CLASSES_LIST_33
+        self.classes_names = utils.CLASSES_NAMES_19 if ds == 19 else utils.CLASSES_NAMES_33
 
     def extract_keypoints(self, results):
         # pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
@@ -35,7 +38,7 @@ class SignDetection:
             self.signs_detected.append(sign)
             print(self.signs_detected)
             if len(self.signs_detected) == 5:
-                if len(np.unique(self.signs_detected)) == 1:
+                if len(np.unique(self.signs_detected)) == 1 and self.signs_detected[0] != 'None':
                     final_sign = self.signs_detected[0]
                     self.text_interpreted +=  " " + final_sign
                     self.app.emit("data",{'data':final_sign})
@@ -51,10 +54,13 @@ class SignDetection:
         frames_array = np.array(frames)
         frames_array = np.expand_dims(frames_array, axis=0)
         predicted_labels_probabilities = self.model.predict(frames_array)[0]
-        predicted_label_indx = np.argmax(predicted_labels_probabilities)
+        if max(predicted_labels_probabilities) >= self.confidence_level:
+            predicted_label_indx = np.argmax(predicted_labels_probabilities)
 
-        if 0 <= predicted_label_indx < len(utils.CLASSES_LIST):
-            predicted_class_name = utils.CLASSES_LIST[predicted_label_indx]
-            word = f"{utils.CLASSES_NAMES[predicted_label_indx]}"
+            if 0 <= predicted_label_indx < len(self.classes_list):
+                predicted_class_name = self.classes_list[predicted_label_indx]
+                word = f"{self.classes_names[predicted_label_indx]}"
+        else:
+            word = 'None'
                     
         return word
