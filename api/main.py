@@ -99,7 +99,7 @@ def connected(data):
     global sign_detection
     print(request.sid,data)
     print("client has connected")
-    sign_detection = SignDetection(model, 20)
+    sign_detection = SignDetection(model, 20, 0.9)
 
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
