@@ -108,7 +108,7 @@ def connected(data):
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
 if __name__ == "__main__":
-    model_path = os.path.join(os.getcwd(), 'model/mplstm_model_4WORDS_Run1__Date_Time_2024_05_11_11_25_46')
+    model_path = os.path.join(os.getcwd(), '../', 'model\mplstm_model_19WORDS_Run1__Date_Time_2024_05_20_15_16_33')
     print("model path: ",model_path)
     model = load_model(model_path)
     socketio.run(app, debug=True,port=5001)
