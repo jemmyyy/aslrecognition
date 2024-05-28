@@ -6,7 +6,7 @@ import camera.utils as utils
 from flask_socketio import emit
 
 class SignDetection:
-    def __init__(self, model, app, no_frames = 20, confidence_level = 0.9):
+    def __init__(self, model, app, no_frames = 20, confidence_level = 0.9, ds = 19):
         self.no_frames = no_frames
         self.signs_detected = []
         self.current_vid = deque(maxlen = self.no_frames)
@@ -17,6 +17,8 @@ class SignDetection:
         self.confidence_level = confidence_level
         self.app = app
         self.app.emit("data", {'data': "shaghal"})
+        self.classes_list = utils.CLASSES_LIST_19 if ds == 19 else utils.CLASSES_LIST_33
+        self.classes_names = utils.CLASSES_NAMES_19 if ds == 19 else utils.CLASSES_NAMES_33
 
     def extract_keypoints(self, results):
         # pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
@@ -55,9 +57,9 @@ class SignDetection:
         if max(predicted_labels_probabilities) >= self.confidence_level:
             predicted_label_indx = np.argmax(predicted_labels_probabilities)
 
-            if 0 <= predicted_label_indx < len(utils.CLASSES_LIST):
-                predicted_class_name = utils.CLASSES_LIST[predicted_label_indx]
-                word = f"{utils.CLASSES_NAMES[predicted_label_indx]}"
+            if 0 <= predicted_label_indx < len(self.classes_list):
+                predicted_class_name = self.classes_list[predicted_label_indx]
+                word = f"{self.classes_names[predicted_label_indx]}"
         else:
             word = 'None'
                     
