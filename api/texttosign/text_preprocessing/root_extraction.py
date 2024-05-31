@@ -19,7 +19,6 @@ class ArabicRoot:
         self.pre4 = ["ت","ي","ب","ل"]
 
 
-
         self.suf5 = ["ون","ات","ان","ين","تن","تم","كن","كم","هن","هم","يا","ني","تي","وا","ما","نا","ية","ها","اء"]
         self.suf4 = ['ت',"ة","ا","ي"]
         
@@ -62,8 +61,6 @@ class ArabicRoot:
         return self.remove_suffix(self.remove_prefix(word))
         
     
-    
-    
     def extra_plural(self,word):
         ''' if the word is plural then convert it to word +  كثير but i need 
             to make some changes in it to handle verbs being plural when word are plural 
@@ -79,6 +76,8 @@ class ArabicRoot:
     def extra_feminine(self,word):
         if(word[-1]=='ة' and word[:-1] in self.word_list):
             return [word[:-1],"مؤنث"]
+        if(word.endswith('تي') and word[:-2] in self.word_list):
+            return [word[:-2],"مؤنث","ملكى"]
         return []
     
     def extra_ownership(self,word):
