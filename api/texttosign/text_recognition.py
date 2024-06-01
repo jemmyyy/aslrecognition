@@ -26,13 +26,13 @@ class TextToSign():
         # Iterate through the dictionary and perform replacements
         for old_word, new_word in self.__conversion_dict.items():
             text = text.replace(old_word, new_word)
-        text = Transformer.pipeline(text)
+        text = Transformer.pipeline(text, view= True)
         text = self.__translation.translate(text)
         text = " ".join(text)
         for old_word, new_word in self.__conversion_dict.items():
             text = text.replace(old_word, new_word)
         text = text.split(" ")
-        text = self.__sign_obj.pipeline(text)
+        text = self.__sign_obj.pipeline(text, view= True)
         return text
 
     def text_recognition(self, text):
