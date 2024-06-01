@@ -2,7 +2,7 @@ SEQUENCE_LENGTH = 20
 CLASSES_LIST_33 = ["0032", "0037", "0039", "0041", "0044", "0053", "0055", "0059", "0065", "0088", "0092", "0116",
                  "0132", "0161", "0162", "0163", "0164", "0167", "0168", "0169", "0174", "0181", "0182",
                  "0192", "0218", "0255", "0289", "0291", "0327", "0387", "0393", "0418", "0459"]
-CLASSES_NAMES_33 = ["alif", "haa", "daal", "raa", "shiin", "kaaf", "miim", "yaa", "hamza", "heart", "hospital", "pain",
+CLASSES_NAMES_33 = ["ألِف", "haa", "daal", "raa", "shiin", "kaaf", "miim", "yaa", "hamza", "heart", "hospital", "pain",
                  "medicine", "drink", "sleep", "wake up", "hear", "rise", "descend", "open", "love", "think", "help",
                  "family", "people", "tired", "welcome", "etfadal", "7ammam", "ma8reb", "mosque", "el7", "eng"]
 

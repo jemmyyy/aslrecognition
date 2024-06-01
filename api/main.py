@@ -23,20 +23,26 @@ def open_camera():
         video_capture = VideoCapture(0)
     return video_capture
 
-@app.route('/api/texttosign', methods=['GET'])
+@app.route('/api/texttosign', methods=['POST'])
 def text_recognition():
+    print("text recognition",request.json)
     # Request input validation
     if 'text' not in request.json:
         return jsonify({'error': 'No text field provided'})
     
-    if 'avatar' not in request.json:
+
         return jsonify({'error': 'No avatar field provided'})
 
     # Get the value of the text and avatar fields from the request
     text = request.json['text']
     avatar =  request.json['avatar']
 
+    if isinstance(text, bytes):
+        text = text.decode('utf-8')
+
+    print(text)
     text_sign = TextToSign(avatar)
+    print(text_sign)
     frames_path = text_sign.text_recognition(text)
 
     # Return the processed text
@@ -108,7 +114,7 @@ def connected(data):
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
 if __name__ == "__main__":
-    model_path = os.path.join(os.getcwd(), '../', 'model\mplstm_model_19WORDS_Run1__Date_Time_2024_05_20_15_16_33')
+    model_path = os.path.join(os.getcwd(), 'model','mplstm_model_19WORDS_Run1__Date_Time_2024_05_20_15_16_33')
     print("model path: ",model_path)
     model = load_model(model_path)
     socketio.run(app, debug=True,port=5001)

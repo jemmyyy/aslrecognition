@@ -6,7 +6,7 @@ import camera.utils as utils
 from flask_socketio import emit
 
 class SignDetection:
-    def __init__(self, model, app, no_frames = 20, confidence_level = 0.9, ds = 19):
+    def __init__(self, model, app, no_frames = 20, confidence_level = 0.9, ds = 33):
         self.no_frames = no_frames
         self.signs_detected = []
         self.current_vid = deque(maxlen = self.no_frames)
@@ -16,7 +16,6 @@ class SignDetection:
         self.text_interpreted = ""
         self.confidence_level = confidence_level
         self.app = app
-        self.app.emit("data", {'data': "shaghal"})
         self.classes_list = utils.CLASSES_LIST_19 if ds == 19 else utils.CLASSES_LIST_33
         self.classes_names = utils.CLASSES_NAMES_19 if ds == 19 else utils.CLASSES_NAMES_33
 
@@ -38,7 +37,7 @@ class SignDetection:
             self.signs_detected.append(sign)
             print(self.signs_detected)
             if len(self.signs_detected) == 5:
-                if len(np.unique(self.signs_detected)) == 1 and self.signs_detected[0] != 'None':
+                if len(np.unique(self.signs_detected)) == 1 and self.signs_detected[0] != 'None' and self.signs_detected[0] != self.text_interpreted.split(" ")[-1]:
                     final_sign = self.signs_detected[0]
                     self.text_interpreted +=  " " + final_sign
                     self.app.emit("data",{'data':final_sign})
