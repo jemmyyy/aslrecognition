@@ -23,7 +23,7 @@ def open_camera():
         video_capture = VideoCapture(0)
     return video_capture
 
-@app.route('/api/texttosign', methods=['GET'])
+@app.route('/api/texttosign', methods=['POST'])
 def text_recognition():
     # Request input validation
     if 'text' not in request.json:
