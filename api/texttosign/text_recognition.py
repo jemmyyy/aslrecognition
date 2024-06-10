@@ -32,11 +32,11 @@ class TextToSign():
         for old_word, new_word in self.__conversion_dict.items():
             text = text.replace(old_word, new_word)
         text = text.split(" ")
-        text = self.__sign_obj.pipeline(text, view= True)
-        return text
+        text,string_array = self.__sign_obj.pipeline(text, view= True)
+        return text,string_array
 
     def text_recognition(self, text):
-        text = self.__text_preprocessing(text)
-        return text
+        text,string_array = self.__text_preprocessing(text)
+        return text,string_array 
     
 

@@ -41,6 +41,11 @@ class Signs:
     
     
     def pipeline(self,lis,view=False):
-        lis = self.get_letters(lis,view)
-        lis = self.get_signs(lis,view)
-        return lis
+        string_array = self.get_letters(lis,view)
+        lis = self.get_signs(string_array,view)
+        print("after signs ",lis,string_array)
+        if (len(string_array) == len(lis)):
+            frames_dict = dict(zip(string_array, lis))
+            print(frames_dict)
+            return frames_dict, string_array
+        return lis, string_array

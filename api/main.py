@@ -40,13 +40,13 @@ def text_recognition():
     if isinstance(text, bytes):
         text = text.decode('utf-8')
 
-    print(text)
+    print(text,"text")
     text_sign = TextToSign(avatar)
-    print(text_sign)
-    frames_path = text_sign.text_recognition(text)
+    print(text_sign,"text_sign")
+    frames_path,string_array = text_sign.text_recognition(text)
 
     # Return the processed text
-    return jsonify({'frames_path': frames_path})
+    return jsonify({'frames_path': frames_path,'string_array':string_array})
     
 
 
